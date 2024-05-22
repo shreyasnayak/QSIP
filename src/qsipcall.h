@@ -1,3 +1,12 @@
+/** @file qsipcall.h
+ *
+ * @copyright (C) 2024
+ * @date 2024.05.21
+ * @version 1.0.0
+ * @author Shreyas Nayak <shreyasnayak21@gmail.com>
+ *
+ */
+
 #ifndef QSIPCALL_H
 #define QSIPCALL_H
 #include <QUuid>
@@ -5,20 +14,21 @@
 #include <pjsua2.hpp>
 #include <iostream>
 #include <functional>
+#include <regex>
 
 using namespace pj;
 
 class QSipCall : public Call
 {
 public:
-    enum E_CALL_TYPE
+    enum ECallType
     {
-        INCOMING,
-        OUTGOING,
-        TRANSFER
+        INCOMING_CALL,
+        OUTGOING_CALL,
+        TRANSFER_CALL
     };
 
-    struct CallStats
+    struct SCallStats
     {
         /** @brief This will is this valid data or not */
         bool valid=false;
@@ -58,26 +68,25 @@ public:
         QString codecInUse;
     };
 
-    struct CallSetting
+    struct SCallSetting
     {
-        float TxVolume;
-        float RxVolume;
-        QSipCall::E_CALL_TYPE CallType;
-        QUuid CallUuid;
-        Call *TransferThis;
+        float txVolume;
+        float rxVolume;
+        ECallType callType;
+        QUuid callUuid;
+        Call *transferThis;
     };
 
 private:
-    E_CALL_TYPE m_callType;
+    ECallType m_callType;
     QUuid m_callId;
     bool m_isCallAlive;
-    bool m_isOnHold;
+    bool m_callHoldIndicator;
     bool m_ignoreMediaState;
     bool m_ctStatus;
     float m_txvol;
     float m_rxvol;
-    Call *m_tranferThis;
-    AudioMedia *m_callMedia;
+    Call* m_tranferThis;
     QHash<QString,QString> m_customHeader;
     unsigned int m_callState;
     unsigned int m_callMediaState;
@@ -87,32 +96,27 @@ private:
     std::function<void (int level,QString writtenBy,QString message)> m_fnLogMessage;
     std::function<void (QString number,QString proxy,QUuid txCallId)> m_fnCallTransferRequest;
 
-
 public:
     QSipCall(Account &account, CallSetting setting, int callId = PJSUA_INVALID_ID);
     ~QSipCall();
 
-    bool isCallAlive();
-    bool isOnHold() const;
-    void setOnHold(bool isOnHold);
+    bool getCallHoldIndicator() const;
+    void setCallHoldIndicator(bool callHoldIndicator);
+    void setCustomHeader(const QHash<QString,QString> &pairs);
+    void appendCustomHeader(const QString key,const QString value);
+    QHash<QString,QString> getCustomHeader() const;
     void ignoreMediaState(bool status);
-
-    AudioMedia *callMedia();
-    AudioMedia *callMediaNow();
-    QSipCall::CallStats callStats();
-    E_CALL_TYPE callType() const;
-    unsigned int callState() const;
-    unsigned int callMediaState() const;
+    bool isCallAlive();
+    AudioMedia* getCallMedia();
+    SCallStats getCallStats();
+    ECallType getCallType() const;
+    unsigned int getCallState() const;
+    unsigned int getCallMediaState() const;
 
     void onCallTransferRequest(std::function<void (QString number,QString proxy,QUuid txCallId)> functor);
     void onCallStateChange(std::function<void (QUuid callId,pjsip_inv_state state,QString remark,unsigned int sipCode)> functor);
     void onCallMediaStateChange(std::function<void (QUuid callId,int state)> functor);
     void onLog(std::function<void (int level,QString writtenBy,QString message)> functor);
-
-    QHash<QString, QString> getCustomHeader() const;
-    void setCustomHeader(const QHash<QString, QString> &value);
-    void appendCustomHeader(const QString key,const QString value);
-
 private:
     void onCallState(OnCallStateParam &prm);
     void onCallMediaState(OnCallMediaStateParam &prm);

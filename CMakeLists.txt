@@ -14,8 +14,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_library(QSIP STATIC
   src/qsip.cpp
   src/qsip.h
-  src/qsipaccount.h src/qsipaccount.cpp
-  src/qsipcall.h src/qsipcall.cpp
+  src/qsipaccount.h
+  src/qsipaccount.cpp
+  src/qsipcall.h
+  src/qsipcall.cpp
+  src/qsipbuddy.h
+  src/qsipbuddy.cpp
 )
 
 target_link_libraries(QSIP PRIVATE Qt${QT_VERSION_MAJOR}::Core)

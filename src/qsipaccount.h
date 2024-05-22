@@ -1,26 +1,37 @@
+/** @file qsipaccount.h
+ *
+ * @copyright (C) 2024
+ * @date 2024.05.21
+ * @version 1.0.0
+ * @author Shreyas Nayak <shreyasnayak21@gmail.com>
+ *
+ */
+
+
 #ifndef QSIPACCOUNT_H
 #define QSIPACCOUNT_H
 #include <QString>
 #include <QUuid>
+#include <qsipcall.h>
 
 class QSipAccount : public Account
 {
 public:
     QSipAccount();
 private:
-    QString _proxy;
-    QString _server;
-    QString _userId;
-    QString _domain;
-    QString _displayName;
-    QUuid _accId;
-    bool _accStatus;
-    float _txVol=1.0f;
-    float _rxVol=1.0f;
-    bool _tranSipHeader;
-    bool _sendSessionId;
+    QString m_proxy;
+    QString m_server;
+    QString m_userId;
+    QString m_domain;
+    QString m_displayName;
+    QUuid m_accId;
+    bool m_accStatus;
+    bool m_tranSipHeader;
+    bool m_sendSessionId;
+    float m_txVol = 1.0f;
+    float m_rxVol = 1.0f;
 
-    QMap<QUuid,CInCall*> _CallMap;
+    QMap<QUuid,QSipCall*> _CallMap;
     CInBuddy *_pPresence;
 
     /* Call Back functions pointers */
